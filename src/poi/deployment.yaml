@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poi
+  labels:
+    app: poi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poi
+  template:
+    metadata:
+      labels:
+        app: poi
+    spec:
+      containers:
+      - name: poi
+        image: registryiax7978.azurecr.io/tripinsights/poi:1.0
+        volumeMounts:
+          - mountPath: /secrets
+            name: tripsecret-volume
+        ports:
+        - containerPort: 80
+      volumes:
+        - name: tripsecret-volume
+          secret:
+            secretName: tripsecret
