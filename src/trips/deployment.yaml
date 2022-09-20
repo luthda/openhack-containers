@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trips
+  labels:
+    app: trips
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trips
+  template:
+    metadata:
+      labels:
+        app: trips
+    spec:
+      containers:
+      - name: trips
+        image: registryiax7978.azurecr.io/tripinsights/trips:1.0
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: tripsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: trips
+  name: trips-service
+spec:
+  selector:
+    app: trips
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+

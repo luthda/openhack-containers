@@ -26,3 +26,17 @@ spec:
         - name: tripsecret-volume
           secret:
             secretName: tripsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: poi
+  name: poi-service
+spec:
+  selector:
+    app: poi
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
