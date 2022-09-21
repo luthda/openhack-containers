@@ -4,6 +4,7 @@ metadata:
   name: poi
   labels:
     app: poi
+  namespace: api
 spec:
   replicas: 1
   selector:
@@ -33,6 +34,7 @@ metadata:
   labels:
     app: poi
   name: poi-service
+  namespace: api
 spec:
   selector:
     app: poi

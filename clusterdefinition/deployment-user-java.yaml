@@ -30,6 +30,7 @@ metadata:
   labels:
     app: user-java
   name: user-java-service
+  namespace: api
 spec:
   selector:
     app: user-java

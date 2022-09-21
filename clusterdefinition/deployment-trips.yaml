@@ -4,7 +4,7 @@ metadata:
   name: trips
   labels:
     app: trips
-  namespace: web
+  namespace: api
 spec:
   replicas: 1
   selector:
@@ -30,6 +30,7 @@ metadata:
   labels:
     app: trips
   name: trips-service
+  namespace: api
 spec:
   selector:
     app: trips
