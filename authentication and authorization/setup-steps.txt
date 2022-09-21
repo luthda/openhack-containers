@@ -1,0 +1,110 @@
+0. Create web and api user groups
+az ad group create --display-name api --mail-nickname apigroup
+id: ec043926-9d54-4ac7-9b60-bb6e30468543
+
+az ad group create --display-name web --mail-nickname webgroup
+id: 12140f61-fac4-48c5-bfa2-42014431ffdb
+
+az ad group create --display-name clusteradmins --mail-nickname clusteradmins
+eacde2d2-9158-4a28-81bd-1419233d5bfe
+  
+1. Create web and api users with group memberships
+az ad user create web-dev
+id: f2f377e2-9174-462d-9d93-2d359110b82c
+
+az ad user create api-dev
+id: e0de4aa9-3669-4ef0-9920-b94659c09d97
+
+2. Create new subnet-id
+az network vnet subnet create -g teamResources --vnet-name vnet --name tripinsightsubnet --address-prefixes 10.2.1.0/24
+id: /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/tripinsightsubnet
+ 
+3. Add our hacker users to the admin group 
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id 7a71e47a-2ccc-4087-9df1-4281d5614f7c
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id 3e9d5ade-d5bd-44c9-84e2-0086035556d1
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id 3e92a27a-78c9-4389-a709-2fa0256fda1f
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id 8e5c691e-5b14-4e2c-9b67-ea20550526e3
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id b547cf96-2228-432c-b610-a6e2e352b691
+az ad group member add --group eacde2d2-9158-4a28-81bd-1419233d5bfe --member-id 14c036ca-f17d-4f74-a871-83cb32f3644d
+
+4. Create AKS RBAC enabled cluster with AAD using the already provided vnet 5234aeea-b43b-4dce-9a14-3ceb26049f1c
+az aks create -g teamResources -n tripinsightcluster --enable-aad --aad-admin-group-object-ids eacde2d2-9158-4a28-81bd-1419233d5bfe --aad-tenant-id 6042515d-a7d2-4756-a080-dc85bfaf95a4 --network-plugin azure --vnet-subnet-id /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/tripinsightsubnet --no-ssh-key
+
+5. Create namespaces for api and dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: api
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+kubectl apply -f namespaces.yaml
+
+6. Use existing default AKS roles
+view: Azure Kubernetes Service RBAC Reader
+edit: Azure Kubernetes Service RBAC Writer
+
+6. Associate roles to groups with web and api groups
+az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
+az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
+
+az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
+az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
+
+===================
+
+Incomplete attempt to automate as a shell script:
+#!/bin/bash
+#0. Create web and api user groups
+az ad group create --display-name api --mail-nickname apigroup
+az ad group create --display-name web --mail-nickname webgroup
+az ad group create --display-name clusteradmins --mail-nickname clusteradmins
+#TODO: extract api and web group ids and put in $API_GROUP_ID and $WEB_GROUP_ID and $ADMIN_GROUP_ID
+
+  
+#1. Create web and api users with group memberships
+az ad user create web-dev
+az ad user create api-dev
+#TODO: extract api and web user ids and put in $API_USER_ID and $WEB_USER_ID
+
+#2. Create new subnet-id
+az network vnet subnet create -g teamResources --vnet-name vnet --name tripinsightsubnet --address-prefixes 10.2.1.0/24
+#TODO: extract subnet id and put in $SUBNET_ID
+ 
+#3. Add our hacker users to the admin group 
+az ad group member add --group $ADMIN_GROUP_ID --member-id 7a71e47a-2ccc-4087-9df1-4281d5614f7c
+az ad group member add --group $ADMIN_GROUP_ID --member-id 3e9d5ade-d5bd-44c9-84e2-0086035556d1
+az ad group member add --group $ADMIN_GROUP_ID --member-id 3e92a27a-78c9-4389-a709-2fa0256fda1f
+az ad group member add --group $ADMIN_GROUP_ID --member-id 8e5c691e-5b14-4e2c-9b67-ea20550526e3
+az ad group member add --group $ADMIN_GROUP_ID --member-id b547cf96-2228-432c-b610-a6e2e352b691
+az ad group member add --group $ADMIN_GROUP_ID --member-id 14c036ca-f17d-4f74-a871-83cb32f3644d
+
+4. Create AKS RBAC enabled cluster with AAD using the already provided vnet 5234aeea-b43b-4dce-9a14-3ceb26049f1c
+az aks create -g teamResources -n tripinsightcluster --enable-aad --aad-admin-group-object-ids eacde2d2-9158-4a28-81bd-1419233d5bfe --aad-tenant-id 6042515d-a7d2-4756-a080-dc85bfaf95a4 --network-plugin azure --vnet-subnet-id /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/tripinsightsubnet --no-ssh-key
+
+5. Create namespaces for api and dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: api
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+
+kubectl apply -f namespaces.yaml
+
+6. Use existing default AKS roles
+view: Azure Kubernetes Service RBAC Reader
+edit: Azure Kubernetes Service RBAC Writer
+
+6. Associate roles to groups with web and api groups
+az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
+az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
+
+az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
+az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
