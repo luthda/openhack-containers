@@ -102,9 +102,20 @@ kubectl apply -f namespaces.yaml
 view: Azure Kubernetes Service RBAC Reader
 edit: Azure Kubernetes Service RBAC Writer
 
-6. Associate roles to groups with web and api groups
+7. Associate roles to groups with web and api groups
 az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
 az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
 
 az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
 az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
+
+-. Add the keys to key vault
+az keyvault create -n tripinsightvault -g teamResources -l eastus2
+
+az keyvault secret set --vault-name tripinsightvault -n SQL-USER --value sqladminiAx7978
+az keyvault secret set --vault-name tripinsightvault -n SQL-PASSWORD --value xV1az5Mt1
+az keyvault secret set --vault-name tripinsightvault -n SQL-SERVER --value sqlserveriax7978.database.windows.net
+az keyvault secret set --vault-name tripinsightvault -n SQL-DBNAME --value mydrivingDB
+
+-. Add add-on to key vault in aks
+az aks enable-addons --addons azure-keyvault-secrets-provider --name tripinsightcluster --resource-group teamResources
