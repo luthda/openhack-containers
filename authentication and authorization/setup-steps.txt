@@ -108,3 +108,7 @@ az role assignment create --assignee 12140f61-fac4-48c5-bfa2-42014431ffdb --role
 
 az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Writer" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/api
 az role assignment create --assignee ec043926-9d54-4ac7-9b60-bb6e30468543 --role "Azure Kubernetes Service RBAC Reader" --scope /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourcegroups/teamResources/providers/Microsoft.ContainerService/managedClusters/tripinsightcluster/namespaces/web
+
+
+get admin:
+az aks get-credentials -g teamResources -n tripinsightcluster --admin
