@@ -83,7 +83,7 @@ az ad group member add --group $ADMIN_GROUP_ID --member-id b547cf96-2228-432c-b6
 az ad group member add --group $ADMIN_GROUP_ID --member-id 14c036ca-f17d-4f74-a871-83cb32f3644d
 
 4. Create AKS RBAC enabled cluster with AAD using the already provided vnet 5234aeea-b43b-4dce-9a14-3ceb26049f1c
-az aks create -g teamResources -n tripinsightcluster --enable-aad --aad-admin-group-object-ids eacde2d2-9158-4a28-81bd-1419233d5bfe --aad-tenant-id 6042515d-a7d2-4756-a080-dc85bfaf95a4 --network-plugin azure --vnet-subnet-id /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/tripinsightsubnet --no-ssh-key
+az aks create -g teamResources -n tripinsightcluster --enable-aad --enable-azure-rbac --aad-admin-group-object-ids eacde2d2-9158-4a28-81bd-1419233d5bfe --aad-tenant-id 6042515d-a7d2-4756-a080-dc85bfaf95a4 --network-plugin azure --vnet-subnet-id /subscriptions/052140be-e22a-4512-93d7-886f703e0497/resourceGroups/teamResources/providers/Microsoft.Network/virtualNetworks/vnet/subnets/tripinsightsubnet --no-ssh-key
 
 5. Create namespaces for api and dev
 apiVersion: v1
