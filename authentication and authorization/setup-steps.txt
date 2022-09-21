@@ -39,7 +39,7 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: dev
+  name: web
 
 kubectl apply -f namespaces.yaml
 
