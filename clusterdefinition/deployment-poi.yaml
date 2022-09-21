@@ -20,13 +20,17 @@ spec:
         image: registryiax7978.azurecr.io/tripinsights/poi:1.0
         volumeMounts:
           - mountPath: /secrets
-            name: tripsecret-volume
+            name: secrets
+            readOnly: true
         ports:
         - containerPort: 80
       volumes:
-        - name: tripsecret-volume
-          secret:
-            secretName: tripsecret
+      - name: secrets
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: secretvaultsync
 ---
 apiVersion: v1
 kind: Service

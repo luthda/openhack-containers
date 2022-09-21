@@ -18,11 +18,19 @@ spec:
       containers:
       - name: user-java
         image: registryiax7978.azurecr.io/tripinsights/user-java:1.0
+        volumeMounts:
+          - mountPath: /secrets
+            name: secrets
+            readOnly: true
         ports:
         - containerPort: 80
-        envFrom:
-        - secretRef:
-            name: tripsecret
+      volumes:
+      - name: secrets
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: secretvaultsync
 ---
 apiVersion: v1
 kind: Service
