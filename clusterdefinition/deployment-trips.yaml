@@ -37,6 +37,7 @@ kind: Service
 metadata:
   labels:
     app: trips
+    workload: metrics
   name: trips-service
   namespace: api
 spec:
@@ -44,6 +45,7 @@ spec:
     app: trips
   ports:
   - port: 80
+    name: http
     protocol: TCP
     targetPort: 80
 

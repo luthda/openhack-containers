@@ -37,6 +37,7 @@ kind: Service
 metadata:
   labels:
     app: userprofile
+    workload: metrics
   name: userprofile-service
   namespace: api
 spec:
@@ -44,5 +45,6 @@ spec:
     app: userprofile
   ports:
   - port: 80
+    name: http
     protocol: TCP
     targetPort: 80

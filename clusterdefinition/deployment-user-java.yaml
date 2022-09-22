@@ -37,6 +37,7 @@ kind: Service
 metadata:
   labels:
     app: user-java
+    workload: metrics
   name: user-java-service
   namespace: api
 spec:
@@ -44,5 +45,6 @@ spec:
     app: user-java
   ports:
   - port: 80
+    name: http
     protocol: TCP
     targetPort: 80

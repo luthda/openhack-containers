@@ -122,3 +122,31 @@ az aks enable-addons --addons azure-keyvault-secrets-provider --name tripinsight
 
 -. get admin credentials:
 az aks get-credentials -g teamResources -n tripinsightcluster --admin
+
+8. Added the new application in his own namespace (insurance)
+  - important to set the resources (requests and limits)...see clusterdefinition/new-app.yaml
+
+9. Installed Prometheus on the cluster
+  - instructions: https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
+  - to access the prometheus-server:
+  > kube -n prometheus port-forward svc/prometheus-kube-prometheus-prometheus :9090
+
+10. Reinstall nginx (following: https://kubernetes.github.io/ingress-nginx/user-guide/monitoring/#prometheus-and-grafana-installation-using-service-monitors)
+
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --create-namespace --namespace ingress-nginx \
+    --set controller.config.hsts=false \
+    --set controller.config.redirect-ssl=false
+
+helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+    --set controller.metrics.serviceMonitor.enabled=true \
+    --set controller.metrics.enabled=true \
+    --set controller.metrics.serviceMonitor.additionalLabels.release="prometheus"
+
+11. Monitor resources in the cluster
+> kube top nodes
+
+
+kubectl get prometheus -n prometheus prometheus-kube-prometheus-prometheus -o=jsonpath='{.spec.serviceMonitorSelector}'
+
+sum by(code, container) (rate(http_requests_received_total[10m]))
